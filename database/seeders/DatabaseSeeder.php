@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -11,7 +12,7 @@ use App\Models\Borrower;
 
 class DatabaseSeeder extends Seeder
 {
-       public function run(): void
+    public function run(): void
     {
         Category::factory()->count(5)->create();
         Book::factory()->count(20)->create();
@@ -20,4 +21,3 @@ class DatabaseSeeder extends Seeder
         Borrower::factory()->count(15)->create();
     }
 }
-
