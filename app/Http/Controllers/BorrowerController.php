@@ -14,38 +14,43 @@ class BorrowerController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'book_id' => 'required|exists:books,id',
             'member_id' => 'required|exists:members,id',
             'librarian_id' => 'required|exists:librarians,id',
             'borrow_date' => 'required|date',
-            'return_date' => 'nullable|date|after_or_equal:borrow_date',
+            'return_date' => 'required|date|after_or_equal:borrow_date',
         ]);
-        return Borrower::create($request->all());
+
+        $borrower = Borrower::create($data);
+
+        return response()->json($borrower->load(['book', 'member', 'librarian']), 201);
     }
+
 
     public function show($id)
     {
         return Borrower::with(['book', 'member', 'librarian'])->findOrFail($id);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Borrower $borrower)
     {
-        $borrower = Borrower::findOrFail($id);
-        $request->validate([
-            'book_id' => 'exists:books,id',
-            'member_id' => 'exists:members,id',
-            'librarian_id' => 'exists:librarians,id',
-            'borrow_date' => 'date',
-            'return_date' => 'nullable|date|after_or_equal:borrow_date',
+        $data = $request->validate([
+            'book_id' => 'required|exists:books,id',
+            'member_id' => 'required|exists:members,id',
+            'librarian_id' => 'required|exists:librarians,id',
+            'borrow_date' => 'required|date',
+            'return_date' => 'required|date|after_or_equal:borrow_date',
         ]);
-        $borrower->update($request->all());
-        return $borrower;
+
+        $borrower->update($data);
+
+        return response()->json($borrower->load(['book', 'member', 'librarian']));
     }
 
-    public function destroy($id)
+    public function destroy(Borrower $borrower)
     {
-        Borrower::destroy($id);
-        return response()->json(['message' => 'Deleted successfully']);
+        $borrower->delete();
+        return response()->json(['message' => 'Borrower deleted successfully.']);
     }
 }
